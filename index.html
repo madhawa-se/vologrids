@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Hello World!</title>
+        <style>
+            body{
+                margin: 0;
+            }
+            #panel-draw,#panel-render{
+                position: absolute;
+                width:50%;
+                box-sizing: border-box;
+                height: 100%;
+            }
+            #panel-draw{
+            }
+            #panel-render{
+                margin-left: 50%;
+            }
+            #toolbar{
+                padding: 20px;
+                background-color: #343f44;
+            }
+            #elem-layer{
+                position: relative;
+            }
+            .sys-render{
+                background-color: aquamarine;
+                position: absolute;
+            }
+            canvas{
+                border: 2px solid black;
+            }
+            .color-pallert span{
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                border: 2px solid white;
+            }
+            .color-pallert p{
+                margin:0;
+            }
+            .color-pallert{
+                padding: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="" id="toolbar">
+            <div class="color-pallert">
+                <p>
+                    <span data-color="yellow" style="background-color:yellow"></span>
+                    <span data-color="red" style="background-color:red"></span>
+                    <span data-color="blue" style="background-color:blue"></span>
+                    <span data-color="green" style="background-color:green"></span>
+                    <span data-color="pink" style="background-color:pink"></span>
+
+                </p>
+            </div>
+        </div>
+        <div class="panel" id="">
+            <div class="" id="panel-draw">
+                <canvas width="600" height="400" id="layer-draw"></canvas>
+            </div>
+            <div class="" id="panel-render">
+                <div class="" id="elem-layer"></div>
+            </div>
+        </div>
+    </body>
+
+    <script>
+        // You can also require other files to run in this process
+        require('./renderer.js');
+        window.$ = window.jQuery = require('./scripts/jquery.js');
+
+        var xElementList = [];
+        var pref = {pallertColor: "yellow"};
+
+        var canvas = document.getElementById("layer-draw");
+        var ctx = canvas.getContext("2d");
+
+        var canvasOffset = $("#layer-draw").offset();
+        var offsetX = canvasOffset.left;
+        var offsetY = canvasOffset.top;
+
+        var isDrawing = false;
+        var startX;
+        var startY;
+
+        function handleMouseDown(e) {
+            mouseX = parseInt(e.clientX - offsetX);
+            mouseY = parseInt(e.clientY - offsetY);
+            //$("#downlog").html("Down: " + mouseX + " / " + mouseY);
+
+            // Put your mousedown stuff here
+            if (isDrawing) {
+                isDrawing = false;
+                ctx.beginPath();
+                ctx.rect(startX, startY, mouseX - startX, mouseY - startY);
+                ctx.fill();
+
+                renderElement(startX, startY, mouseX - startX, mouseY - startY);
+                canvas.style.cursor = "default";
+            } else {
+                isDrawing = true;
+                startX = mouseX;
+                startY = mouseY;
+                canvas.style.cursor = "crosshair";
+            }
+
+        }
+
+        $("#layer-draw").mousedown(function (e) {
+            handleMouseDown(e);
+        });
+
+
+
+        var XElement = function () {
+            this.width = width;
+            this.height = hight;
+            this.x = x;
+            this.y = y;
+            this.color = color;
+
+        };
+
+
+        function renderElement(x, y, width, height) {
+            jQuery('<div/>', {
+                class: 'sys-render',
+                style: 'width:' + width + 'px;' +
+                        'height:' + height + 'px;' +
+                        'left:' + x + 'px;' +
+                        'top:' + y + 'px;' +
+                        'background-color:' + pref.pallertColor + ";"
+
+            }).appendTo('#elem-layer');
+        }
+
+
+        var realWidth=600;
+        var referenceWidth=1560;
+        var gutterWidth=15;
+        var columns=12;
+        function drawBoard() {
+            for (var i = 0; i < (columns*3-1); i ++) {
+                ctx.moveTo(0.5 + x, 0);
+                ctx.lineTo(0.5 + x, bh );
+            }
+
+            ctx.strokeStyle = "black";
+            ctx.stroke();
+        }
+
+
+        $(document).ready(function () {
+            drawBoard();
+            $(".color-pallert span").on("click", function () {
+                var color = $(this).data("color");
+                pref.pallertColor = color;
+            });
+        });
+    </script>
+</html>
